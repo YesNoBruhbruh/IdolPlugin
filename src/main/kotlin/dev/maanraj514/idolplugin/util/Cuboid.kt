@@ -3,29 +3,18 @@ package dev.maanraj514.idolplugin.util
 import org.bukkit.Location
 import org.bukkit.Particle
 
-class Cuboid(posA: Location, posB: Location) {
+data class Cuboid(val posA: Location, val posB: Location) {
 
     // make sure the pos1 and pos2 don't get switched up, rearrange.
 
     val world = posA.world
 
-    var x1: Int
-    var x2: Int
-    var y1: Int
-    var y2: Int
-    var z1: Int
-    var z2: Int
-
-    init {
-        x2 = posA.blockX.coerceAtLeast(posB.blockX)
-        x1 = posA.blockX.coerceAtMost(posB.blockX)
-
-        y2 = posA.blockY.coerceAtLeast(posB.blockY)
-        y1 = posA.blockY.coerceAtMost(posB.blockY)
-
-        z2 = posA.blockZ.coerceAtLeast(posB.blockZ)
-        z1 = posA.blockZ.coerceAtMost(posB.blockZ)
-    }
+    var x1: Int = posA.blockX.coerceAtMost(posB.blockX)
+    var x2: Int = posA.blockX.coerceAtLeast(posB.blockX)
+    var y1: Int = posA.blockY.coerceAtMost(posB.blockY)
+    var y2: Int = posA.blockY.coerceAtLeast(posB.blockY)
+    var z1: Int = posA.blockZ.coerceAtMost(posB.blockZ)
+    var z2: Int = posA.blockZ.coerceAtLeast(posB.blockZ)
 
     fun inRegion(location: Location): Boolean {
         val x = location.x.toInt()

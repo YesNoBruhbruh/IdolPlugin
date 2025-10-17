@@ -1,5 +1,7 @@
 package dev.maanraj514.idolplugin.idol
 
+import dev.maanraj514.idolplugin.gui.GUIService
+import dev.maanraj514.idolplugin.gui.impl.WishesGUI
 import dev.maanraj514.idolplugin.util.Cuboid
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -11,7 +13,8 @@ class Idol(
     val name: String,
     val cuboid: Cuboid,
     // maybe could have made an abstraction DonationItem -> Implementation..
-    private val donationFilter: MutableMap<Material, Int>) {
+    private val donationFilter: MutableMap<Material, Int>,
+    private val guiService: GUIService) {
 
     init {
         //purely for visuals
@@ -40,6 +43,8 @@ class Idol(
         val player = Bukkit.getPlayer(idolPlayer.uuid) ?: return true
 
         player.sendMessage("Your trustPoints have been updated to ${idolPlayer.trust} from $beforeTrust")
+
+        guiService.openGUI(player, WishesGUI())
 
         return true
     }

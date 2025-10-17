@@ -1,19 +1,20 @@
 package dev.maanraj514.idolplugin.idol
 
+import dev.maanraj514.idolplugin.gui.GUIService
 import dev.maanraj514.idolplugin.tracker.DroppedItemsTracker
 import dev.maanraj514.idolplugin.util.Cuboid
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import java.util.UUID
 
-class IdolManager {
+class IdolManager(private val guiService: GUIService) {
 
     private val idols = mutableMapOf<String, Idol>()
     private val idolPlayers = mutableMapOf<UUID, IdolPlayer>()
     val droppedItemsTracker = DroppedItemsTracker()
 
     fun createIdol(name: String, cuboid: Cuboid, donationFilter: MutableMap<Material, Int>) {
-        idols[name] = Idol(name, cuboid, donationFilter)
+        idols[name] = Idol(name, cuboid, donationFilter, guiService)
     }
 
     fun getIdol(name: String): Idol? {

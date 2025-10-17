@@ -23,11 +23,11 @@ class IdolPlugin : JavaPlugin() {
     private var droppedItemsTaskId = -1
 
     override fun onEnable() {
-        idolManager = IdolManager()
-
         guiRegistry = GUIRegistry()
         guiController = GUIController(guiRegistry)
         guiService = GUIService(guiRegistry)
+
+        idolManager = IdolManager(guiService)
 
         droppedItemsTaskId = Bukkit.getScheduler().runTaskTimer(
             this, DroppedItemsTrackerTask(idolManager), 0, 10).taskId
