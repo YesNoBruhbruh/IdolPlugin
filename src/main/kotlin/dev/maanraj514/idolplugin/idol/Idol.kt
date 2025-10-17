@@ -13,6 +13,12 @@ class Idol(
     // maybe could have made an abstraction DonationItem -> Implementation..
     private val donationFilter: MutableMap<Material, Int>) {
 
+    init {
+        //purely for visuals
+
+        cuboid.display()
+    }
+
     // also factor in how many of that specific item was donated, and multiply.
     fun onDonation(item: Item, idolPlayer: IdolPlayer): Boolean {
         if (!canDonate(item.location)) return false

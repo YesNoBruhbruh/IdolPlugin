@@ -4,6 +4,8 @@ import dev.maanraj514.idolplugin.idol.IdolManager
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.EntityPickupItemEvent
+import org.bukkit.event.entity.ItemDespawnEvent
 import org.bukkit.event.player.PlayerDropItemEvent
 
 class IdolListener(private val idolManager: IdolManager) : Listener {
@@ -16,12 +18,16 @@ class IdolListener(private val idolManager: IdolManager) : Listener {
         val player = event.player
         val idolPlayer = idolManager.getOrCreateIdolPlayer(player)
 
-        for (idolEntry in idolManager.getIdols()) {
-            val idol = idolEntry.value
+        idolManager.droppedItemsTracker.onDrop(item, idolPlayer)
+    }
 
-            if (idol.onDonation(item, idolPlayer)){ // this means the correct idol was found
-                break
-            }
-        }
+    @EventHandler
+    fun onItemDespawn(event: ItemDespawnEvent) {
+        idolManager.droppedItemsTracker.onPickup(event.entity)
+    }
+
+    @EventHandler
+    fun onItemPickup(event: EntityPickupItemEvent) {
+        idolManager.droppedItemsTracker.onPickup(event.item)
     }
 }

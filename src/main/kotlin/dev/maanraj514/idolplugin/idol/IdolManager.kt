@@ -1,5 +1,6 @@
 package dev.maanraj514.idolplugin.idol
 
+import dev.maanraj514.idolplugin.tracker.DroppedItemsTracker
 import dev.maanraj514.idolplugin.util.Cuboid
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -9,6 +10,7 @@ class IdolManager {
 
     private val idols = mutableMapOf<String, Idol>()
     private val idolPlayers = mutableMapOf<UUID, IdolPlayer>()
+    val droppedItemsTracker = DroppedItemsTracker()
 
     fun createIdol(name: String, cuboid: Cuboid, donationFilter: MutableMap<Material, Int>) {
         idols[name] = Idol(name, cuboid, donationFilter)
@@ -20,9 +22,10 @@ class IdolManager {
 
     fun getOrCreateIdolPlayer(player: Player): IdolPlayer {
         val uuid = player.uniqueId
-        if (!idolPlayers.containsKey(uuid)) {
-            println("the uuid $uuid is not present in the map!")
-        }
+        return getOrCreateIdolPlayer(uuid)
+    }
+
+    fun getOrCreateIdolPlayer(uuid: UUID): IdolPlayer {
         return idolPlayers.getOrPut(uuid, {IdolPlayer(uuid, 0)})
     }
 
@@ -32,7 +35,7 @@ class IdolManager {
         return idols
     }
 
-    fun clear() {
+    fun cleanup() {
         idols.clear()
         idolPlayers.clear()
     }

@@ -44,7 +44,7 @@ class Cuboid(posA: Location, posB: Location) {
             for (y in y1..y2) {
                 for (z in z1..z2) {
                     world.spawnParticle(
-                        Particle.ANGRY_VILLAGER,
+                        Particle.HAPPY_VILLAGER,
                         x.toDouble(),
                         y.toDouble(),
                         z.toDouble(),
