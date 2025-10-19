@@ -2,19 +2,26 @@ package dev.maanraj514.idolplugin.idol
 
 import dev.maanraj514.idolplugin.gui.GUIService
 import dev.maanraj514.idolplugin.gui.impl.WishesGUI
+import dev.maanraj514.idolplugin.idol.filter.impl.DonationHandler
+import dev.maanraj514.idolplugin.idol.filter.impl.RitualHandler
+import dev.maanraj514.idolplugin.idol.filter.impl.WishingHandler
 import dev.maanraj514.idolplugin.util.Cuboid
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Item
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 
 class Idol(
     val name: String,
     val cuboid: Cuboid,
     // maybe could have made an abstraction DonationItem -> Implementation..
-    private val donationFilter: MutableMap<Material, Int>,
     private val guiService: GUIService) {
+
+    private val donationHandler = DonationHandler()
+    private val ritualHandler = RitualHandler()
+    private val wishingItems = WishingHandler()
 
     init {
         //purely for visuals
@@ -29,24 +36,35 @@ class Idol(
         val itemStack = item.itemStack
         item.remove() // to show visually it got accepted
 
-        val material = itemStack.type
-        val amount = itemStack.amount
-
-        // the -1 is for deduction for wrong offering,
-        // but make sure to allow for configurability in end product.
-        val trustPoints = donationFilter.getOrDefault(material, -1) * amount
-        val beforeTrust = idolPlayer.trust
-        idolPlayer.trust += trustPoints
+        handleDonation(itemStack, idolPlayer)
 
         // if not active anymore, totally fine, we just need
         // to send a message anyway
         val player = Bukkit.getPlayer(idolPlayer.uuid) ?: return true
 
-        player.sendMessage("Your trustPoints have been updated to ${idolPlayer.trust} from $beforeTrust")
-
-        guiService.openGUI(player, WishesGUI())
+        player.sendMessage("Your trustPoints have been updated to ${idolPlayer.trust}")
 
         return true
+    }
+
+    private fun handleDonation(itemStack: ItemStack, idolPlayer: IdolPlayer) {
+        val material = itemStack.type
+        val isWish = material != Material.BUNDLE
+
+        if (isWish) {
+            val amount = itemStack.amount
+            // the -1 is for deduction for wrong offering,
+            // but make sure to allow for configurability in end product.
+            val trustPoints = donationHandler.getIdolItemPoints(itemStack)
+            idolPlayer.trust += trustPoints
+
+            guiService.openGUI(idolPlayer, WishesGUI(idolPlayer))
+            return
+        }
+
+        // this means it is a ritual.
+
+
     }
 
     fun canDonate(itemLocation: Location): Boolean {

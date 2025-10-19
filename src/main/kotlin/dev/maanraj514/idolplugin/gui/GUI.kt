@@ -1,15 +1,19 @@
 package dev.maanraj514.idolplugin.gui
 
+import dev.maanraj514.idolplugin.idol.IdolPlayer
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.inventory.InventoryOpenEvent
 
-abstract class GUI(private val guiSettings: GUISettings) : GUIHandler {
+abstract class GUI(
+    protected val idolPlayer: IdolPlayer,
+    protected val guiSettings: GUISettings) : GUIHandler {
 
     val inventory = Bukkit.createInventory(null, guiSettings.guiSize, guiSettings.guiTitle)
     private val buttonMap = mutableMapOf<Int, GUIButton>()
+
     protected var cancelClicks = false
 
     fun addButton(slot: Int, button: GUIButton) {
@@ -33,5 +37,5 @@ abstract class GUI(private val guiSettings: GUISettings) : GUIHandler {
         decorate(event.player as Player)
     }
 
-    override fun onClose(event: InventoryCloseEvent) {}
+    override fun onClose(event: InventoryCloseEvent) { }
 }

@@ -3,14 +3,16 @@ package dev.maanraj514.idolplugin.gui.impl
 import dev.maanraj514.idolplugin.gui.GUI
 import dev.maanraj514.idolplugin.gui.GUIButton
 import dev.maanraj514.idolplugin.gui.GUISettings
+import dev.maanraj514.idolplugin.idol.IdolPlayer
 import dev.maanraj514.idolplugin.util.toComponent
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
-class WishesGUI : GUI(GUISettings("<gold>Wishes!</gold>".toComponent(), 9*3)) {
+class WishesGUI(idolPlayer: IdolPlayer) : GUI(idolPlayer, GUISettings("<gold>Wishes!</gold>".toComponent(), 9*3)) {
 
     init {
+        guiSettings.guiTitle = "<gold><bold>Current points: ${idolPlayer.trust}</bold></gold>".toComponent()
 
         cancelClicks = true
 

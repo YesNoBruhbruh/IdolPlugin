@@ -1,5 +1,7 @@
 package dev.maanraj514.idolplugin.gui
 
+import dev.maanraj514.idolplugin.idol.IdolPlayer
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 
 class GUIService(private val guiRegistry: GUIRegistry) {
@@ -9,5 +11,10 @@ class GUIService(private val guiRegistry: GUIRegistry) {
         guiRegistry.registerGUI(inventory, gui)
 
         player.openInventory(inventory)
+    }
+
+    fun openGUI(idolPlayer: IdolPlayer, gui: GUI) {
+        val player = Bukkit.getPlayer(idolPlayer.uuid) ?: return
+        openGUI(player, gui)
     }
 }
