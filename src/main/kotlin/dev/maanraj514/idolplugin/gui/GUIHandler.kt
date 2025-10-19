@@ -10,5 +10,5 @@ interface GUIHandler {
 
     fun onOpen(event: InventoryOpenEvent)
 
-    fun  onClose(event: InventoryCloseEvent)
+    fun onClose(event: InventoryCloseEvent)
 }

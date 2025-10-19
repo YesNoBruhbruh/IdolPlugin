@@ -25,7 +25,7 @@ class WishesGUI(idolPlayer: IdolPlayer) : PagedGUI(idolPlayer, GUISettings("<gol
                 },
                 {
                     val slot = it.slot
-                    println("You clicked on my slot! which is ${slot}!")
+                    println("You clicked on my DIRT slot! which is ${slot}!")
                 }))
         }
         for (i in 50 until 100) {
@@ -36,7 +36,7 @@ class WishesGUI(idolPlayer: IdolPlayer) : PagedGUI(idolPlayer, GUISettings("<gol
 //                    val player = (it.whoClicked as Player)
 //                    player.sendMessage("<light_purple>You have clicked on wish 1!</light_purple>".toComponent())
                     val slot = it.slot
-                    println("You clicked on my slot! which is ${slot}!")
+                    println("You clicked on my BEDROCK slot! which is ${slot}!")
                 }))
         }
     }

@@ -16,10 +16,9 @@ import kotlin.math.ceil
 abstract class PagedGUI(idolPlayer: IdolPlayer, guiSettings: GUISettings) : GUI(idolPlayer, guiSettings) {
 
     private val slots = mutableListOf<Int>()
+    private val paginatedButtons = mutableMapOf<Int, GUIButton>()
     private var usableSlots = 0
     protected var currentPage = 0
-
-    private val listenToClick = mutableMapOf<Int, GUIButton>()
 
     protected var nextPageButton = GUIButton({
         ItemBuilder(Material.GREEN_CONCRETE)
@@ -63,7 +62,7 @@ abstract class PagedGUI(idolPlayer: IdolPlayer, guiSettings: GUISettings) : GUI(
 
             val button = buttons[result]
             inventory.setItem(slots[i], button.iconCreator.apply(player))
-            listenToClick[slots[i]] = button
+            paginatedButtons[slots[i]] = button
             index++
         }
     }
@@ -95,6 +94,8 @@ abstract class PagedGUI(idolPlayer: IdolPlayer, guiSettings: GUISettings) : GUI(
     private fun addMenuBorder(player: Player) {
         inventory.setItem(48, backPageButton.iconCreator.apply(player))
         inventory.setItem(50, nextPageButton.iconCreator.apply(player))
+        paginatedButtons[48] = backPageButton
+        paginatedButtons[50] = nextPageButton
 
         val fillerItem = ItemBuilder(Material.BLACK_STAINED_GLASS_PANE)
             .name(Component.empty())
@@ -141,21 +142,8 @@ abstract class PagedGUI(idolPlayer: IdolPlayer, guiSettings: GUISettings) : GUI(
     }
 
     override fun onClick(event: InventoryClickEvent) {
-        super.onClick(event)
+        event.isCancelled = cancelClicks
 
-        val item = event.currentItem
-        if (item == null || item.type == Material.AIR) return
-        if (item.itemMeta == null) return
-
-        val player = event.whoClicked as Player
-
-        val leftItem = backPageButton.iconCreator.apply(player)
-        val rightItem = nextPageButton.iconCreator.apply(player)
-
-        if (item.isSimilar(leftItem)) {
-            backPageButton.eventConsumer.accept(event)
-        } else if (item.isSimilar(rightItem)) {
-            nextPageButton.eventConsumer.accept(event)
-        }
+        handleButton(event, paginatedButtons)
     }
 }

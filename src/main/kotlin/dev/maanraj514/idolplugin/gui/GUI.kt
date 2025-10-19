@@ -31,24 +31,18 @@ abstract class GUI(
     override fun onClick(event: InventoryClickEvent) {
         event.isCancelled = cancelClicks
 
-        val player = event.whoClicked as Player
+        handleButton(event, buttonMap)
+    }
 
+    protected fun handleButton(event: InventoryClickEvent, buttons: Map<Int, GUIButton>) {
         val item = event.currentItem ?: return
 
         val slot = event.slot
-        val button = buttonMap[slot] ?: return
+        val button = buttons[slot] ?: return
 
-        val buttonItem = button.iconCreator.apply(player)
+        val buttonItem = button.iconCreator.apply(event.whoClicked as Player)
 
-        println("passed the getting test!")
-
-        if (!item.isSimilar(buttonItem)){
-            println("item is ${item.type}")
-            println("buttonItem is ${buttonItem.type}")
-            return
-        } // stricter checking
-
-        println("passed the similar test!")
+        if (!item.isSimilar(buttonItem)) return
 
         button.eventConsumer.accept(event)
     }
