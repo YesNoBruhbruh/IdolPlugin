@@ -13,8 +13,8 @@ class IdolManager(private val guiService: GUIService) {
     private val idolPlayers = mutableMapOf<UUID, IdolPlayer>()
     val droppedItemsTracker = DroppedItemsTracker()
 
-    fun createIdol(name: String, cuboid: Cuboid, donationFilter: MutableMap<Material, Int>) {
-        idols[name] = Idol(name, cuboid, donationFilter, guiService)
+    fun createIdol(name: String, cuboid: Cuboid, donationToPoints: MutableMap<Material, Int>, wishToPoints: MutableMap<Material, Int>) {
+        idols[name] = Idol(name, cuboid, guiService, donationToPoints, wishToPoints)
     }
 
     fun getIdol(name: String): Idol? {

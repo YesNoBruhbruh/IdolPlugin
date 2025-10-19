@@ -12,24 +12,44 @@ abstract class GUI(
     protected val guiSettings: GUISettings) : GUIHandler {
 
     val inventory = Bukkit.createInventory(null, guiSettings.guiSize, guiSettings.guiTitle)
-    private val buttonMap = mutableMapOf<Int, GUIButton>()
+    protected val buttonMap = mutableMapOf<Int, GUIButton>()
 
     protected var cancelClicks = false
+
+//    fun addButton(slot: Int, button: GUIButton) {
+//        buttonMap[slot] = button
+//    }
 
     fun addButton(slot: Int, button: GUIButton) {
         buttonMap[slot] = button
     }
 
-    fun decorate(player: Player) {
+    open fun decorate(player: Player) {
         buttonMap.forEach { (slot, button) -> inventory.setItem(slot, button.iconCreator.apply(player)) }
     }
 
     override fun onClick(event: InventoryClickEvent) {
         event.isCancelled = cancelClicks
 
-        val slot = event.slot
+        val player = event.whoClicked as Player
 
+        val item = event.currentItem ?: return
+
+        val slot = event.slot
         val button = buttonMap[slot] ?: return
+
+        val buttonItem = button.iconCreator.apply(player)
+
+        println("passed the getting test!")
+
+        if (!item.isSimilar(buttonItem)){
+            println("item is ${item.type}")
+            println("buttonItem is ${buttonItem.type}")
+            return
+        } // stricter checking
+
+        println("passed the similar test!")
+
         button.eventConsumer.accept(event)
     }
 

@@ -1,10 +1,8 @@
 package dev.maanraj514.idolplugin.idol
 
 import dev.maanraj514.idolplugin.gui.GUIService
-import dev.maanraj514.idolplugin.gui.impl.WishesGUI
-import dev.maanraj514.idolplugin.idol.filter.impl.DonationHandler
-import dev.maanraj514.idolplugin.idol.filter.impl.RitualHandler
-import dev.maanraj514.idolplugin.idol.filter.impl.WishingHandler
+import dev.maanraj514.idolplugin.gui.paged.impl.RitualsGUI
+import dev.maanraj514.idolplugin.gui.paged.impl.WishesGUI
 import dev.maanraj514.idolplugin.util.Cuboid
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -17,15 +15,13 @@ class Idol(
     val name: String,
     val cuboid: Cuboid,
     // maybe could have made an abstraction DonationItem -> Implementation..
-    private val guiService: GUIService) {
-
-    private val donationHandler = DonationHandler()
-    private val ritualHandler = RitualHandler()
-    private val wishingItems = WishingHandler()
+    private val guiService: GUIService,
+    private val donationToPoints: MutableMap<Material, Int>,
+    //TODO implementation of rituals
+    private val wishToPoints: MutableMap<Material, Int>) {
 
     init {
         //purely for visuals
-
         cuboid.display()
     }
 
@@ -41,7 +37,6 @@ class Idol(
         // if not active anymore, totally fine, we just need
         // to send a message anyway
         val player = Bukkit.getPlayer(idolPlayer.uuid) ?: return true
-
         player.sendMessage("Your trustPoints have been updated to ${idolPlayer.trust}")
 
         return true
@@ -55,7 +50,7 @@ class Idol(
             val amount = itemStack.amount
             // the -1 is for deduction for wrong offering,
             // but make sure to allow for configurability in end product.
-            val trustPoints = donationHandler.getIdolItemPoints(itemStack)
+            val trustPoints = donationToPoints.getOrDefault(material, -1) * amount
             idolPlayer.trust += trustPoints
 
             guiService.openGUI(idolPlayer, WishesGUI(idolPlayer))
@@ -64,7 +59,7 @@ class Idol(
 
         // this means it is a ritual.
 
-
+        guiService.openGUI(idolPlayer, RitualsGUI(idolPlayer))
     }
 
     fun canDonate(itemLocation: Location): Boolean {
@@ -74,26 +69,26 @@ class Idol(
     fun addDonationFilter(material: Material, trustPoints: Int): Boolean {
         if (isAlreadyFiltered(material)) return false
 
-        donationFilter[material] = trustPoints
+        donationToPoints[material] = trustPoints
         return true
     }
 
     fun removeDonationFilter(material: Material): Boolean {
         if (!isAlreadyFiltered(material)) return false // doesn't exist
 
-        donationFilter.remove(material)
+        donationToPoints.remove(material)
         return true
     }
 
     fun sendDonationFilterMessage(player: Player) {
-        if (donationFilter.isEmpty()){
+        if (donationToPoints.isEmpty()){
             player.sendMessage("No filter yet!")
             return
         }
 
         player.sendMessage("==========DONATION FILTER==========")
 
-        for (filterEntry in donationFilter.entries) {
+        for (filterEntry in donationToPoints.entries) {
             val material = filterEntry.key
             val trustPoints = filterEntry.value
 
@@ -104,6 +99,6 @@ class Idol(
     }
 
     fun isAlreadyFiltered(material: Material): Boolean {
-        return donationFilter.containsKey(material)
+        return donationToPoints.containsKey(material)
     }
 }

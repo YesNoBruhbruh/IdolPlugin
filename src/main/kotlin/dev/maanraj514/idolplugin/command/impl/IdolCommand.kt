@@ -33,7 +33,7 @@ class IdolCommand(private val idolManager: IdolManager) : Command("idol") {
                     return
                 }
 
-                idolManager.createIdol(idolName, cuboid, mutableMapOf())
+                idolManager.createIdol(idolName, cuboid, mutableMapOf(), mutableMapOf())
                 player.sendMessage("Successfully created idol!")
             }
             "donationFilter" -> {

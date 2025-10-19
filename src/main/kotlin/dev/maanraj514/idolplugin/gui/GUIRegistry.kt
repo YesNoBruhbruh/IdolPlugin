@@ -7,8 +7,8 @@ class GUIRegistry {
 
     private val registeredGUIs = mutableMapOf<Inventory, GUIHandler>()
 
-    fun registerGUI(inventory: Inventory, GUIHandler: GUIHandler) {
-        registeredGUIs[inventory] = GUIHandler
+    fun registerGUI(inventory: Inventory, guiHandler: GUIHandler) {
+        registeredGUIs[inventory] = guiHandler
     }
 
     fun unregisterGUI(inventory: Inventory) {
