@@ -18,11 +18,15 @@ class Idol(
     private val guiService: GUIService,
     private val donationToPoints: MutableMap<Material, Int>,
     //TODO implementation of rituals
-    private val wishToPoints: MutableMap<Material, Int>) {
+    val wishToPoints: MutableMap<Material, Int>) {
 
     init {
         //purely for visuals
         cuboid.display()
+
+        //TODO remove this after testing
+        wishToPoints[Material.DIAMOND] = 50
+        wishToPoints[Material.NETHERITE_INGOT] = 100
     }
 
     // also factor in how many of that specific item was donated, and multiply.
@@ -53,7 +57,7 @@ class Idol(
             val trustPoints = donationToPoints.getOrDefault(material, -1) * amount
             idolPlayer.trust += trustPoints
 
-            guiService.openGUI(idolPlayer, WishesGUI(idolPlayer))
+            guiService.openGUI(idolPlayer, WishesGUI(idolPlayer, this))
             return
         }
 
