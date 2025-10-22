@@ -2,7 +2,6 @@ package dev.maanraj514.idolplugin.gui
 
 import org.bukkit.inventory.Inventory
 
-
 class GUIRegistry {
 
     private val registeredGUIs = mutableMapOf<Inventory, GUIHandler>()

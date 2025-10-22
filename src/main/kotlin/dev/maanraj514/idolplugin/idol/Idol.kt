@@ -10,6 +10,7 @@ import org.bukkit.Material
 import org.bukkit.entity.Item
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import java.util.concurrent.ThreadLocalRandom
 
 class Idol(
     val name: String,
@@ -20,13 +21,14 @@ class Idol(
     //TODO implementation of rituals
     val wishToPoints: MutableMap<Material, Int>) {
 
+    private val random = ThreadLocalRandom.current()
+
     init {
         //purely for visuals
         cuboid.display()
 
-        //TODO remove this after testing
-        wishToPoints[Material.DIAMOND] = 50
-        wishToPoints[Material.NETHERITE_INGOT] = 100
+        //TODO remove after testing
+        wishToPoints[Material.NETHERITE_INGOT] = 50
     }
 
     // also factor in how many of that specific item was donated, and multiply.
@@ -64,6 +66,46 @@ class Idol(
         // this means it is a ritual.
 
         guiService.openGUI(idolPlayer, RitualsGUI(idolPlayer))
+    }
+
+    //method for chance, it should return true or not
+
+    fun isWishSuccess(wishMaterial: Material, idolPlayer: IdolPlayer): Boolean {
+        // they can't wish for what's not on the map.
+        val wishCost = wishToPoints[wishMaterial] ?: return false
+
+        val trustPoints = idolPlayer.trust
+
+        if (wishCost > trustPoints) return false
+
+        // Probably in the future, make this more configurable
+        // Wishes with rarities
+        // and different success rate scaling options for each of em.
+
+        // default: 50% of getting what you wish for if trustPoints == cost
+        // if you have more than cost, it scales up.
+
+        val randomResult = random.nextInt(100)
+
+        var successRate = 50
+
+        // already subtract
+        idolPlayer.trust -= wishCost
+
+//        println("trustPoints = $trustPoints")
+//        println("pointsFromPlayer = ${idolPlayer.trust}")
+
+        if (trustPoints > wishCost) {
+            var i = trustPoints - wishCost
+            while (i > 0) {
+                successRate++ // for every point above cost, success rate increments 1
+                i-- // the while loop gotta end somehow lol
+            }
+        }
+
+        println("randomResult = $randomResult, successRate = $successRate")
+
+        return randomResult < successRate
     }
 
     fun canDonate(itemLocation: Location): Boolean {

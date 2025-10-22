@@ -8,7 +8,6 @@ import dev.maanraj514.idolplugin.idol.IdolPlayer
 import dev.maanraj514.idolplugin.util.ItemBuilder
 import dev.maanraj514.idolplugin.util.toComponent
 import net.kyori.adventure.text.Component
-import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
@@ -32,15 +31,21 @@ class WishesGUI(idolPlayer: IdolPlayer, idol: Idol) : PagedGUI(idolPlayer, GUISe
                         .lore(listOf(Component.text("trustCost: $wishPointsCost")))
                         .build()
                 }, {
-                    //TODO implement random chance system for trust and scaling.
-                    if (idolPlayer.trust < wishPointsCost) return@GUIButton
-
                     val player = it.whoClicked as Player
+
+                    if (idolPlayer.trust < wishPointsCost) {
+                        player.sendMessage("<red>You do not have enough trust!</red>".toComponent())
+                        return@GUIButton
+                    }
+
+                    if (!idol.isWishSuccess(wishMaterial, idolPlayer)){
+                        player.sendMessage("<red>Your wish has been unfulfilled!</red>".toComponent())
+                        return@GUIButton
+                    }
 
                     player.inventory.addItem(ItemStack(wishMaterial))
                     player.sendMessage("<green>You have redeemed your wish!</green>".toComponent())
 
-                    idolPlayer.trust -= wishPointsCost
                     player.sendMessage("<aqua>Your trust has been updated to ${idolPlayer.trust}</aqua>".toComponent())
                 })
             addButton(i, wishButton)
