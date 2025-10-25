@@ -4,6 +4,6 @@ import java.util.UUID
 
 class IdolPlayer(
     val uuid: UUID,
-    var trust: Int
+    var trust: Double
     ) {
 }

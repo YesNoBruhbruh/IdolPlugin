@@ -1,0 +1,3 @@
+trust:
+  decay-interval: 60 # this is in seconds.
+  decay-amount: 5 # how much trust points are lost.

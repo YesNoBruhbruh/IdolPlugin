@@ -1,12 +1,10 @@
 package dev.maanraj514.idolplugin.idol
 
 import dev.maanraj514.idolplugin.gui.GUIService
-import dev.maanraj514.idolplugin.idol.action.Ritual
 import dev.maanraj514.idolplugin.tracker.DroppedItemsTracker
 import dev.maanraj514.idolplugin.util.Cuboid
 import org.bukkit.Material
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
 import java.util.UUID
 
 class IdolManager(private val guiService: GUIService) {
@@ -19,9 +17,9 @@ class IdolManager(private val guiService: GUIService) {
         name: String,
         cuboid: Cuboid,
         donationToPoints: MutableMap<Material, Int>,
-        wishToPoints: MutableMap<Material, Int>,
-        ritualToPoints: MutableList<Ritual>) {
-        idols[name] = Idol(name, cuboid, guiService, donationToPoints, wishToPoints, ritualToPoints)
+        penalizedItems: MutableMap<Material, Int>,
+        wishToPoints: MutableMap<Material, Int>) {
+        idols[name] = Idol(name, cuboid, guiService, donationToPoints, penalizedItems, wishToPoints)
     }
 
     fun getIdol(name: String): Idol? {
@@ -34,7 +32,7 @@ class IdolManager(private val guiService: GUIService) {
     }
 
     fun getOrCreateIdolPlayer(uuid: UUID): IdolPlayer {
-        return idolPlayers.getOrPut(uuid, {IdolPlayer(uuid, 0)})
+        return idolPlayers.getOrPut(uuid, {IdolPlayer(uuid, 0.0)})
     }
 
     // TODO save all to database
@@ -43,7 +41,12 @@ class IdolManager(private val guiService: GUIService) {
         return idols
     }
 
+    fun getIdolPlayers(): Map<UUID, IdolPlayer> {
+        return idolPlayers
+    }
+
     fun cleanup() {
+        idols.forEach { (name, idol) -> idol.destroy() }
         idols.clear()
         idolPlayers.clear()
     }

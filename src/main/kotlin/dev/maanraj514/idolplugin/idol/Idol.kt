@@ -2,18 +2,17 @@ package dev.maanraj514.idolplugin.idol
 
 import dev.maanraj514.idolplugin.gui.GUIService
 import dev.maanraj514.idolplugin.gui.paged.impl.WishesGUI
-import dev.maanraj514.idolplugin.idol.action.Ritual
-import dev.maanraj514.idolplugin.idol.action.impl.ExpandBorderRitual
 import dev.maanraj514.idolplugin.util.Cuboid
 import dev.maanraj514.idolplugin.util.toComponent
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.entity.EntityType
 import org.bukkit.entity.Item
 import org.bukkit.entity.Player
+import org.bukkit.entity.TextDisplay
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.meta.BundleMeta
+import java.util.UUID
 import java.util.concurrent.ThreadLocalRandom
 
 class Idol(
@@ -23,23 +22,27 @@ class Idol(
     private val guiService: GUIService,
     //                               DonationMaterial required Points
     private val donationToPoints: MutableMap<Material, Int>,
+    //TODO implement handling for this
+    private val penalizedItems: MutableMap<Material, Int>,
     //                     wishMaterial   required points
-    val wishToPoints: MutableMap<Material, Int>,
-    //                             ritualActionType    required Items    required Points
-    val rituals: MutableList<Ritual>) {
+    private val wishToPoints: MutableMap<Material, Int>) {
 
     private val random = ThreadLocalRandom.current()
+
+    private var hologramId = UUID.randomUUID()
 
     init {
         //purely for visuals
         cuboid.display()
 
+        val hologram = cuboid.world.spawnEntity(cuboid.findCenter(), EntityType.TEXT_DISPLAY) as TextDisplay
+        hologramId = hologram.uniqueId
+        hologram.text("<gold><bold>$name</bold></gold>".toComponent())
+
         //TODO remove this after testing too
-
-        val requiredItems = mutableListOf<ItemStack>()
-        requiredItems.add(ItemStack(Material.OAK_LOG))
-
-        rituals.add(ExpandBorderRitual(requiredItems, 100, 5000000, cuboid.world.uid))
+        wishToPoints[Material.DIAMOND] = 50
+        wishToPoints[Material.BUNDLE] = 5
+        wishToPoints[Material.NETHERITE_INGOT] = 100
     }
 
     // also factor in how many of that specific item was donated, and multiply.
@@ -61,61 +64,15 @@ class Idol(
 
     private fun handleDonation(itemStack: ItemStack, idolPlayer: IdolPlayer) {
         val material = itemStack.type
-        val isWish = material != Material.BUNDLE
 
-        if (isWish) {
-            val amount = itemStack.amount
-            // the -1 is for deduction for wrong offering,
-            // but make sure to allow for configurability in end product.
-            val trustPoints = donationToPoints.getOrDefault(material, -1) * amount
-            idolPlayer.trust += trustPoints
+        val amount = itemStack.amount
+        // the -1 is for deduction for wrong offering,
+        // but make sure to allow for configurability in end product.
+        val trustPoints = donationToPoints.getOrDefault(material, -1) * amount
+        idolPlayer.trust += trustPoints
 
-            guiService.openGUI(idolPlayer, WishesGUI(idolPlayer, this))
-            return
-        }
-
-        handleRitual(itemStack, idolPlayer)
-    }
-
-    private fun handleRitual(bundleItem: ItemStack, idolPlayer: IdolPlayer) {
-        val itemMeta = bundleItem.itemMeta ?: return
-        val bundleItemMeta = itemMeta as BundleMeta
-        if (!bundleItemMeta.hasItems()) return
-
-        val player = Bukkit.getPlayer(idolPlayer.uuid) ?: return // not online?
-
-        val ritual = getRitual(bundleItemMeta.items)
-        if (ritual == null) {
-            player.sendMessage("<red>Couldn't find the ritual with your items!</red>".toComponent())
-            return
-        }
-
-        val ritualCost = ritual.requiredTrust
-
-        // can't perform ritual if they don't have enough points
-        if (idolPlayer.trust < ritualCost){
-            // put the sack back into their inventory
-            player.inventory.addItem(bundleItem)
-            return
-        }
-
-        idolPlayer.trust -= ritualCost
-        println("before worldSize = ${cuboid.world.worldBorder.size}")
-        ritual.performRitual()
-        player.sendMessage("<light_purple>Performing ritual...</light_purple>".toComponent())
-        println("after worldSize = ${cuboid.world.worldBorder.size}")
-    }
-
-    private fun getRitual(items: List<ItemStack>): Ritual? {
-        for (ritual in rituals) {
-            val requiredItems = ritual.requiredItems
-
-            if (items.containsAll(requiredItems)) {
-                return ritual
-            }
-        }
-
-        return null
+        guiService.openGUI(idolPlayer, WishesGUI(idolPlayer, this))
+        return
     }
 
     //method for chance, it should return true or not
@@ -135,7 +92,9 @@ class Idol(
         // default: 50% of getting what you wish for if trustPoints == cost
         // if you have more than cost, it scales up.
 
-        val randomResult = random.nextInt(100)
+        val randomResult = random.nextInt(1, 101)
+
+        //TODO implement configurable scaling
 
         var successRate = 50
 
@@ -194,7 +153,28 @@ class Idol(
         player.sendMessage("===================================")
     }
 
+    fun destroy() {
+
+        cuboid.world.getEntity(hologramId)?.remove()
+
+        donationToPoints.clear()
+        penalizedItems.clear()
+        wishToPoints.clear()
+    }
+
     fun isAlreadyFiltered(material: Material): Boolean {
         return donationToPoints.containsKey(material)
+    }
+
+    fun getWishToPoints(): Map<Material, Int> {
+        return wishToPoints
+    }
+
+    fun getDonationToPoints(): Map<Material, Int> {
+        return donationToPoints
+    }
+
+    fun getPenalizedItems(): Map<Material, Int> {
+        return penalizedItems
     }
 }

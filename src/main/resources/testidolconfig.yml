@@ -1,0 +1,26 @@
+donation:
+  pos1:
+    world:
+    x:
+    y:
+    z:
+  pos2:
+    world:
+    x:
+    y:
+    z:
+  acceptable-item-filter:
+    - "DIAMOND-5"
+  unacceptable-item-filter:
+    - "DIRT-5"
+  super-profit-cycle:
+    enabled: true
+    multipler: 1.2
+    interval: 1 # in days
+wishing:
+  wish-list:
+    - "NETHERITE_INGOT-10"
+  success-rate: # if points are the same as cost, it will be 50/50 regardless.
+    always-default: false # always on 50/50
+    scaling: 1 # if always-default is false, for every point above cost, it adds 1
+

@@ -4,7 +4,7 @@ import org.bukkit.Location
 import org.bukkit.Particle
 import org.bukkit.World
 
-data class Cuboid(val posA: Location, val posB: Location) {
+data class Cuboid(private val posA: Location, private val posB: Location) {
 
     // make sure the pos1 and pos2 don't get switched up, rearrange.
 
