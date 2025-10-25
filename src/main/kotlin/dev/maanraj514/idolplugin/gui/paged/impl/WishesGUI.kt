@@ -11,11 +11,9 @@ import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
-class WishesGUI(idolPlayer: IdolPlayer, idol: Idol) : PagedGUI(idolPlayer, GUISettings("<gold>Wishes!</gold>".toComponent(), 54)) {
+class WishesGUI(idolPlayer: IdolPlayer, idol: Idol) : PagedGUI(idolPlayer, GUISettings("<gold>Wishes! Current points: ${idolPlayer.trust}</gold>".toComponent(), 54)) {
 
     init {
-        guiSettings.guiTitle = "<gold><bold>Current points: ${idolPlayer.trust}</bold></gold>".toComponent()
-
         cancelClicks = true
 
         var i=0

@@ -2,12 +2,13 @@ package dev.maanraj514.idolplugin.util
 
 import org.bukkit.Location
 import org.bukkit.Particle
+import org.bukkit.World
 
 data class Cuboid(val posA: Location, val posB: Location) {
 
     // make sure the pos1 and pos2 don't get switched up, rearrange.
 
-    val world = posA.world
+    val world: World = posA.world
 
     var x1: Int = posA.blockX.coerceAtMost(posB.blockX)
     var x2: Int = posA.blockX.coerceAtLeast(posB.blockX)

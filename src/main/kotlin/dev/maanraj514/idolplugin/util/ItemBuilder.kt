@@ -3,12 +3,13 @@ package dev.maanraj514.idolplugin.util
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.ItemMeta
 
 class ItemBuilder(private val itemStack: ItemStack) {
 
     constructor(material: Material) : this(ItemStack(material))
 
-    private val itemMeta = itemStack.itemMeta
+    private val itemMeta: ItemMeta = itemStack.itemMeta
 
     fun name(name: Component): ItemBuilder {
         itemMeta.itemName(name)
@@ -17,6 +18,13 @@ class ItemBuilder(private val itemStack: ItemStack) {
 
     fun lore(lore: List<Component>): ItemBuilder {
         itemMeta.lore(lore)
+        return this
+    }
+
+    fun loreLine(line: Component): ItemBuilder {
+        val lore = itemMeta.lore() ?: return this
+        lore.add(line)
+        lore(lore)
         return this
     }
 

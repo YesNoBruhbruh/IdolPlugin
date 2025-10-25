@@ -1,15 +1,19 @@
 package dev.maanraj514.idolplugin.idol
 
 import dev.maanraj514.idolplugin.gui.GUIService
-import dev.maanraj514.idolplugin.gui.paged.impl.RitualsGUI
 import dev.maanraj514.idolplugin.gui.paged.impl.WishesGUI
+import dev.maanraj514.idolplugin.idol.action.Ritual
+import dev.maanraj514.idolplugin.idol.action.impl.ExpandBorderRitual
 import dev.maanraj514.idolplugin.util.Cuboid
+import dev.maanraj514.idolplugin.util.toComponent
+import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Item
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.BundleMeta
 import java.util.concurrent.ThreadLocalRandom
 
 class Idol(
@@ -17,9 +21,12 @@ class Idol(
     val cuboid: Cuboid,
     // maybe could have made an abstraction DonationItem -> Implementation..
     private val guiService: GUIService,
+    //                               DonationMaterial required Points
     private val donationToPoints: MutableMap<Material, Int>,
-    //TODO implementation of rituals
-    val wishToPoints: MutableMap<Material, Int>) {
+    //                     wishMaterial   required points
+    val wishToPoints: MutableMap<Material, Int>,
+    //                             ritualActionType    required Items    required Points
+    val rituals: MutableList<Ritual>) {
 
     private val random = ThreadLocalRandom.current()
 
@@ -27,8 +34,12 @@ class Idol(
         //purely for visuals
         cuboid.display()
 
-        //TODO remove after testing
-        wishToPoints[Material.NETHERITE_INGOT] = 50
+        //TODO remove this after testing too
+
+        val requiredItems = mutableListOf<ItemStack>()
+        requiredItems.add(ItemStack(Material.OAK_LOG))
+
+        rituals.add(ExpandBorderRitual(requiredItems, 100, 5000000, cuboid.world.uid))
     }
 
     // also factor in how many of that specific item was donated, and multiply.
@@ -63,9 +74,48 @@ class Idol(
             return
         }
 
-        // this means it is a ritual.
+        handleRitual(itemStack, idolPlayer)
+    }
 
-        guiService.openGUI(idolPlayer, RitualsGUI(idolPlayer))
+    private fun handleRitual(bundleItem: ItemStack, idolPlayer: IdolPlayer) {
+        val itemMeta = bundleItem.itemMeta ?: return
+        val bundleItemMeta = itemMeta as BundleMeta
+        if (!bundleItemMeta.hasItems()) return
+
+        val player = Bukkit.getPlayer(idolPlayer.uuid) ?: return // not online?
+
+        val ritual = getRitual(bundleItemMeta.items)
+        if (ritual == null) {
+            player.sendMessage("<red>Couldn't find the ritual with your items!</red>".toComponent())
+            return
+        }
+
+        val ritualCost = ritual.requiredTrust
+
+        // can't perform ritual if they don't have enough points
+        if (idolPlayer.trust < ritualCost){
+            // put the sack back into their inventory
+            player.inventory.addItem(bundleItem)
+            return
+        }
+
+        idolPlayer.trust -= ritualCost
+        println("before worldSize = ${cuboid.world.worldBorder.size}")
+        ritual.performRitual()
+        player.sendMessage("<light_purple>Performing ritual...</light_purple>".toComponent())
+        println("after worldSize = ${cuboid.world.worldBorder.size}")
+    }
+
+    private fun getRitual(items: List<ItemStack>): Ritual? {
+        for (ritual in rituals) {
+            val requiredItems = ritual.requiredItems
+
+            if (items.containsAll(requiredItems)) {
+                return ritual
+            }
+        }
+
+        return null
     }
 
     //method for chance, it should return true or not

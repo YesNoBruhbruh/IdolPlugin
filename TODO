@@ -1,0 +1,6 @@
+Nothing here yet, just get the plugin working and deliver to the client.
+
+If it completely done, then try to do the following:
+
+1. Create separate modules for API and plugin
+2. Adding onto the API stuff, make sure to add the support for custom rituals.

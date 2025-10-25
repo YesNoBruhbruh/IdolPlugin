@@ -6,6 +6,7 @@ import dev.maanraj514.idolplugin.idol.IdolManager
 import dev.maanraj514.idolplugin.util.LocationUtil
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import kotlin.collections.mutableListOf
 
 @CommandInfo("idol", "main idol command", "idolplugin.command.idol")
 class IdolCommand(private val idolManager: IdolManager) : Command("idol") {
@@ -16,6 +17,8 @@ class IdolCommand(private val idolManager: IdolManager) : Command("idol") {
     /*
     * /idol create <idolName>
     * /idol donationFilter <idolName> <add/remove/list> <material> <trustPoints>
+    * //TODO /idol wish <idolName> <add/remove/list> <material> <trustPoints>
+    * //TODO /idol ritual <idolName> <add/remove/list> <ritualName>
     * */
 
     override fun execute(player: Player, args: Array<out String>) {
@@ -33,7 +36,7 @@ class IdolCommand(private val idolManager: IdolManager) : Command("idol") {
                     return
                 }
 
-                idolManager.createIdol(idolName, cuboid, mutableMapOf(), mutableMapOf())
+                idolManager.createIdol(idolName, cuboid, mutableMapOf(), mutableMapOf(), mutableListOf())
                 player.sendMessage("Successfully created idol!")
             }
             "donationFilter" -> {

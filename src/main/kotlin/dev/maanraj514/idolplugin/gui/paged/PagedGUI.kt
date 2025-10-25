@@ -48,7 +48,7 @@ abstract class PagedGUI(idolPlayer: IdolPlayer, guiSettings: GUISettings) : GUI(
         addMenuBorder(player)
         currentPage = page
 
-        val buttons = buttonMap.values.toMutableList()
+        val buttons = buttonMap.values.toList()
         val amount = buttons.size
 
         val start = (page-1)*usableSlots
@@ -56,6 +56,7 @@ abstract class PagedGUI(idolPlayer: IdolPlayer, guiSettings: GUISettings) : GUI(
 
         var index = 0
 
+        // i is for the slot, index is for the button
         for (i in 0 until usableSlots) {
             val result = start + index
             if (index > end || amount <= result) continue
@@ -69,7 +70,7 @@ abstract class PagedGUI(idolPlayer: IdolPlayer, guiSettings: GUISettings) : GUI(
 
     fun nextPage(player: Player) {
         val pages = getPagesRequired()
-        if ((currentPage - 1) == pages) return //already at last page
+        if ((currentPage - 1) == pages) return //can't go to next page
 
         decorate(player, currentPage+1)
     }
